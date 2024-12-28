@@ -20,5 +20,4 @@ fp-info-cache
 *.step
 *.3dshapes/
 
-# Generated production files
-production/
+production/backups/
