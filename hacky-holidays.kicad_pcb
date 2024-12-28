@@ -7979,6 +7979,19 @@
 				)
 			)
 		)
+		(property "LCSC" "C36936538"
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "f5ebdd81-3bcb-4966-853e-6d219476df3d")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
 		(path "/9964417e-18d9-46e1-92cd-509a6f6d88ff")
 		(sheetname "/")
 		(sheetfile "hacky-holidays.kicad_sch")
