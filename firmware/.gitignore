@@ -1,0 +1,15 @@
+*.asm
+*.lst
+*.mem
+*.rel
+*.rst
+*.sym
+*.adb
+*.lk
+*.map
+*.mem
+*.ihx
+*.hex
+*.bin
+
+compile_commands.json
