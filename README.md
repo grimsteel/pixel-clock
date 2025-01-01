@@ -1,9 +1,15 @@
-# the pixel clock
+# The Pixel Clock
 
-A clock-shaped PCB with 8 Neopixels and a buzzer. Build on a `CH552` MCU. Powered by two rechargeable CR2032s.
+A clock-shaped PCB with 8 Neopixels and a buzzer. Built on a `CH552` MCU. Powered by two rechargeable LIR2032s.
 
-This does not function as an actual clock. Rather, it can be used to play music, with the neopixels signifying the pitch.
+Although this cannot actually be used as a clock, it can be used to play songs, with the neopixels flashing in sync.
+
+Firmware using [ch554_sdcc](https://github.com/Blinkinlabs/ch554_sdcc) is in the firmware directory.
+
+[gerber.zip](https://gerber.zip/2d/?boardUrl=%20https%3A%2F%2Fraw.githubusercontent.com%2Fgrimsteel%2Fpixel-clock%2Frefs%2Fheads%2Fmain%2Fproduction%2Fhacky-holidays.zip)
 
 ---
 
-[KiCanvas](https://kicanvas.org/?github=https%3A%2F%2Fgithub.com%2Fgrimsteel%2Fpixel-clock%2Fblob%2Fmain%2Fhacky-holidays.kicad_pro)
+![gerber - top](images/gerber-top.svg)
+![gerber - bottom](images/gerber-bottom.svg)
+![kicad 3d](images/kicad-3d.png)
