@@ -10,9 +10,9 @@ Firmware using [ch554_sdcc](https://github.com/Blinkinlabs/ch554_sdcc) is in the
 
 ---
 
-![schematic](images/schematic.png)
+![schematic](https://raw.githubusercontent.com/grimsteel/pixel-clock/refs/heads/main/images/schematic.png)
 
-![gerber - top](images/gerber-top.svg)
-![gerber - bottom](images/gerber-bottom.svg)
+![gerber - top](https://raw.githubusercontent.com/grimsteel/pixel-clock/refs/heads/main/images/gerber-top.svg)
+![gerber - bottom](https://raw.githubusercontent.com/grimsteel/pixel-clock/refs/heads/main/images/gerber-bottom.svg)
 
-![kicad 3d](images/kicad-3d.png)
+![kicad 3d](https://raw.githubusercontent.com/grimsteel/pixel-clock/refs/heads/main/images/kicad-3d.png)
