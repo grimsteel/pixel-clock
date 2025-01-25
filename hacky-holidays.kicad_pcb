@@ -2286,7 +2286,7 @@
 		(layer "F.Cu")
 		(uuid "3cc0c777-6c02-42ff-a72f-3e191f21b2c4")
 		(at 187.425 42.25 90)
-		(property "Value" "WS2812B"
+		(property "Value" "D11"
 			(at 0 4.45 90)
 			(layer "F.Fab")
 			(uuid "01fba51d-a206-4b3d-80e3-a921e2c8ff4e")
@@ -2297,7 +2297,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "WS2812B"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -9584,7 +9584,7 @@
 		(layer "F.Cu")
 		(uuid "f10b66a0-f031-486d-87e1-dbad5217b960")
 		(at 173.25 57 90)
-		(property "Value" "WS2812B"
+		(property "Value" "D10"
 			(at 0 4.45 90)
 			(layer "F.Fab")
 			(uuid "7f600f73-b46d-448b-a798-4c82091b0457")
@@ -9595,7 +9595,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "WS2812B"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
