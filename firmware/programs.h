@@ -4,7 +4,8 @@
 #include <stdint.h>
 
 // Predefined programs
-#define PROGRAM1_LENGTH 19
+// #define PROGRAM1_LENGTH 19
+#define PROGRAM1_LENGTH 6
 
 static __xdata uint16_t program_1_notes[PROGRAM1_LENGTH] = {G4, G4,  G4, F4S, F4S, F4S,
 
@@ -24,10 +25,19 @@ static __xdata uint8_t program_1_durations[PROGRAM1_LENGTH] = {
 };
 
 // Hues (degrees)
-// TODO: individual hues for each WS2812B
+/*/// TODO: individual hues for each WS2812B
 static __xdata uint16_t program_1_hues[PROGRAM1_LENGTH] = {
   303, 15, 15, 30, 30, 30,
   45, 30, 45, 120,
   45, 30, 45, 120, 60,
   45, 30, 45, 303
+  };*/
+
+static __xdata uint8_t program1_colors[PROGRAM1_LENGTH][3] = {
+{ 0, 15, 0 },
+{ 15, 15, 0 },
+{ 15, 0, 0 },
+{ 15, 0, 15 },
+{ 0, 0, 15 },
+{ 0, 15, 15 },
 };

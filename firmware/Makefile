@@ -10,7 +10,7 @@ C_FILES := $(wildcard *.c) $(CH554_SDCC_PATH)/debug.c
 CC = sdcc
 OBJCOPY = objcopy
 PACK_HEX = packihx
-WCHISP ?= wchisptool -g -f
+WCHISP ?= wchisp flash
 
 #######################################################
 
@@ -26,6 +26,7 @@ CFLAGS := -V -mmcs51 --model-small \
 	--xram-size $(XRAM_SIZE) --xram-loc $(XRAM_LOC) \
 	--code-size $(CODE_SIZE) \
 	-I$(CH554_SDCC_PATH) -DFREQ_SYS=$(FREQ_SYS) \
+    $(SDCC_INCLUDE_FLAGS) \
 	$(EXTRA_FLAGS)
 
 LFLAGS := $(CFLAGS)
@@ -50,7 +51,7 @@ $(TARGET).bin: $(TARGET).ihx
 	$(OBJCOPY) -I ihex -O binary $(TARGET).ihx $(TARGET).bin
 
 flash: $(TARGET).bin pre-flash
-	$(WCHISP) $(TARGET).bin
+	$(WCHISP) $(TARGET).hex
 
 .DEFAULT_GOAL := all
 all: $(TARGET).bin $(TARGET).hex

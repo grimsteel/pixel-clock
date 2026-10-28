@@ -1,10 +1,7 @@
-#ifndef bool
-#define bool int
-#endif
-
 #include "ch554.h"
 #include "debug.h"
 #include "programs.h"
+#include "stdbool.h"
 
 #define P1 0x90
 #define P3 0xB0
@@ -15,23 +12,23 @@
 // BTN2: P1.4
 #define BTN1_PIN 1
 #define BTN2_PIN 4
-SBIT(BTN1, P3, BTN1_PIN);
-SBIT(BTN2, P1, BTN2_PIN);
+SBIT(BTN1, 0xB0, BTN1_PIN);
+SBIT(BTN2, 0x90, BTN2_PIN);
 
 // BUZ: P1.5
 #define BUZ_PIN 5
-SBIT(BUZ, P1, BUZ_PIN);
+SBIT(BUZ, 0x90, BUZ_PIN);
 
 // WS2812B: P1.1
 #define WS2812B_PIN 1
 #define NUM_WS2812B 8
-SBIT(WS2812B, P1, WS2812B_PIN);
+SBIT(WS2812B, 0x90, WS2812B_PIN);
 
 // [0, 256)
-#define WS2812B_BRIGHTNESS 51
+#define WS2812B_BRIGHTNESS 5
 
 // GRB, in order
-uint8_t ws2812b_data[NUM_WS2812B * 3];
+__xdata uint8_t ws2812b_data[24];
 
 // Timer frequency in hertz (6 MHz / 12)
 #define TIMER_FREQUENCY 500000
@@ -73,7 +70,16 @@ void timer0_interrupt(void) __interrupt(INT_NO_TMR0) {
 // Main timer interrupt
 void timer1_interrupt(void) __interrupt(INT_NO_TMR1) { timer1_overflows++; }
 
-inline void btn1_press() {}
+inline void btn1_press() {
+  SAFE_MOD = 0x55;
+  SAFE_MOD = 0xAA;
+
+  // Reset
+  GLOBAL_CFG |= bSW_RESET;
+
+  // exit safe mode
+  SAFE_MOD = 0x00;
+}
 inline void btn2_press() {}
 
 // GPIO interurpt
@@ -126,32 +132,38 @@ void tone(uint16_t frequency_hz, uint8_t duration) {
   TR0 = 1; // begin timer
 }
 
+__data uint8_t byte_count = 24;
+__data uint8_t bit_count;
+
 void ws2812b_write() {
   // disable interrupts (time sensitive!)
   E_DIS = 1;
-  for (uint8_t i = 0; i < NUM_WS2812B * 3; i++) {
+  //for (uint8_t i = 0; i < NUM_WS2812B * 3; i++) {
     // TIMINGS AT 6MHz (tolerance 150 ns aka 1 clock cycle)
-    // T1H = 0.8 us --> 4-5 clock cycles
-    // T1L = 0.45 us --> 2-3 clock cycles
-    // T0H = 0.4 us -> 2-3 clock cycles
-    // T0L = 0.85 us --> 5-6 clock cycles
+    // T1H = 0.9 us --> 6 clock cycles
+    // T1L = 0.3 us --> 2 clock cycles
+    // T0H = 0.3 us -> 2 clock cycles
+    // T0L = 0.9 us --> 6 clock cycles
     // The low times don't _really_ matter - only the high times matter for distinguishing between 0s and 1s
     // RESET TIME: > 50 us --> 300 clock cycles
     // Total time: 7/8 clock cycles
     // TODO: Tune with a logic analyzer
     __asm
-    mov a, r7 ; i is stored in r7
-    add a, #_ws2812b_data ; ws2812b_data[i]
-    mov r6, #8 ; eight bits
+    mov dptr, #_ws2812b_data
+02$:
+    movx A, @dptr
+    mov _bit_count, #8 ; eight bits
 01$:            ; --- loop
-    rlc a           ; 1 cycle
+    rlc A           ; 1 cycle
     setb _WS2812B   ; 1 cycle - T1H begin + T0H begin + T0L end (2 + 1 + 2 + 1) + T1L end (1 + 2 + 1)
+    mov _WS2812B, C ; 2 cycles - T0H end (1 + 1) + T0L begin
     nop             ; 1 cycle
-    mov _WS2812B, c ; 2 cycles - T0H end (1 + 1) + T0L begin
     clr _WS2812B    ; 1 cycle - T1H end (1 + 1 + 2) + T1L begin
-    djnz r6, 01$    ; 2 cycles
+    djnz _bit_count, 01$    ; 2 cycles
+    inc dptr
+    djnz _byte_count, 02$
     __endasm;
-  }
+    //  }
   // re-enable interrupts
   E_DIS = 0;
 }
@@ -190,33 +202,41 @@ void ws2812b_set_hues(uint16_t *hues) {
       r = WS2812B_BRIGHTNESS * hue / 60 - WS2812B_BRIGHTNESS * 4;
       break;
     }
-    ws2812b_data[i * 3] = g;
-    ws2812b_data[i * 3 + 1] = r;
-    ws2812b_data[i * 3 + 2] = b;
+    ws2812b_data[i * 3] = g / 20;
+    ws2812b_data[i * 3 + 1] = r / 20;
+    ws2812b_data[i * 3 + 2] = b / 20;
   }
+}
+
+void set_ws2812b(int i, uint8_t* colors, bool clear) {
+  ws2812b_data[i * 3] = !clear ? colors[0] : 0;
+  ws2812b_data[i * 3 + 1] = !clear ? colors[1] : 0;
+  ws2812b_data[i * 3 + 2] = !clear ? colors[2] : 0;
 }
 
 void next_program_item() {
   if (current_idx == PROGRAM1_LENGTH)  {
     // wait 1 second before repeating
     current_idx = 0;
-    mDelaymS(1000);
   }
-  uint16_t hues[NUM_WS2812B];
+  for (int j = 0; j < 24; j++) ws2812b_data[j] = 0;
+  //uint16_t hues[NUM_WS2812B];
   for (int j = 0; j < NUM_WS2812B; j++) {
-    hues[j] = program_1_hues[current_idx];
+    if (j == (current_idx / 2)) set_ws2812b(j, program1_colors[current_idx], false);
+    else if (j - 4 == (current_idx / 2)) set_ws2812b(j, program1_colors[current_idx + 1], false);
+    //else set_ws2812b(j, 0, true);
   }
-  ws2812b_set_hues(hues);
+  //ws2812b_set_hues(hues);
   ws2812b_write();
   
   // buzzer
-  tone(program_1_notes[current_idx], program_1_durations[current_idx]);
-  current_idx++;
+  //tone(program_1_notes[current_idx], program_1_durations[current_idx]);
+  current_idx+=2;
 }
 
 void main() {
   // frequency is default (6MHz)
-  // CfgFsys(); no need for this
+  CfgFsys(); // no need for this
   mDelaymS(5);
 
   /*// enter safe mode
@@ -239,8 +259,10 @@ void main() {
   
   // push pull mode
   P1_MOD_OC &= ~(1 << WS2812B_PIN);
-  // enable pullup
+  // output mode
   P1_DIR_PU |= 1 << WS2812B_PIN;
+
+  WS2812B = 0;
   
 
   P1_MOD_OC &= ~(1 << BUZ_PIN);
@@ -261,10 +283,13 @@ void main() {
   // gpio edge interrupt mode, enable on 1.4 and 3.1
   GPIO_IE |= bIE_IO_EDGE | bIE_P1_4_LO | bIE_P3_1_LO;
 
-  ET1 = 1; // timer0 interrupt
   TMOD |= bT1_M1;// 8 bit timer1 (0.5 ms for each overflow - 256 / (6 MHz / 12) = 512 us)
   TR1 = 1;
 
   // start program
-  next_program_item();
+  while (true) {
+      next_program_item();
+      mDelaymS(1000);
+  }
+  
 }
